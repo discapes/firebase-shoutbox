@@ -1,5 +1,18 @@
 <script lang="ts">
+	import { auth, reloadUserdata } from '$lib/firebase.client';
+	import { getRedirectResult, GithubAuthProvider } from 'firebase/auth';
 	import '../app.less';
+
+	getRedirectResult(auth).then(async (result) => {
+		if (result) {
+			const credential = GithubAuthProvider.credentialFromResult(result);
+			await fetch('/auth', {
+				method: 'POST',
+				body: JSON.stringify({ idToken: await auth.currentUser?.getIdToken(), credential })
+			});
+			reloadUserdata();
+		}
+	});
 </script>
 
 <svelte:head>

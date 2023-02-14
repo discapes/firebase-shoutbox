@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { db, user, userData } from '$lib/firebase.client';
+	import { auth, user, userData } from '$lib/firebase.client';
 	import { addToShoutbox, getShoutbox } from '$lib/shoutbox';
 	import { oneField } from '$lib/utils';
-	import { doc, getDoc } from 'firebase/firestore';
-	import { get } from 'svelte/store';
+	import DeleteAccount from './DeleteAccount.svelte';
 	import Login from './Login.svelte';
 	import Logout from './Logout.svelte';
 
@@ -40,22 +39,25 @@
 				</p>
 			{/each}
 		</div>
-		{#if $userData}
+		{#if $user}
 			<form on:submit={oneField(send)}>
 				<input name="!" placeholder="..." />
 				<input type="submit" value="Send" />
 			</form>
-		{:else}
+		{:else if $user === null}
 			Login to chat
 		{/if}
 	{:else}
 		Loading shoutbox...
 	{/if}
 	<h1>Account</h1>
-	{#if $userData}
-		Logged in as {$userData?.username}.
+	{#if $user}
+		Logged in as {$userData?.login}.
 		<Logout />
-	{:else if !$user}
+		<DeleteAccount />
+	{:else if $user === undefined}
+		Loading user...
+	{:else}
 		<Login />
 	{/if}
 </div>

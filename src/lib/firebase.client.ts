@@ -26,13 +26,15 @@ export const analytics = getAnalytics(app);
 export const db = getFirestore(app);
 
 export const auth = getAuth(app);
-export const user = writable<User | null>(auth.currentUser);
-export const userData = writable<UserData | null>(null);
+export const user = writable<User | null | undefined>(undefined); // undefined to mean loading (we can use ! in typescript)
+export const userData = writable<UserData | null | undefined>(undefined);
 
-if (auth.currentUser) getUserdata(auth.currentUser).then((data) => userData.set(data));
-
-onAuthStateChanged(auth, (newUser) => {
-	user.set(newUser);
-	if (newUser) getUserdata(newUser).then((data) => userData.set(data));
+export async function reloadUserdata() {
+	if (auth.currentUser) await getUserdata(auth.currentUser).then((data) => userData.set(data));
 	else userData.set(null);
+}
+
+onAuthStateChanged(auth, async (newUser) => {
+	await reloadUserdata();
+	user.set(newUser);
 });

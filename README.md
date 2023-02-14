@@ -1,17 +1,24 @@
 # create-svelte
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+Firebase rules:
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /shoutbox/{document} {
+      allow read: if true;
+      allow create: if
+      	get(/databases/$(database)/documents/users/$(request.auth.uid)).data.login == request.resource.data.username
+   			&& request.resource.data.timestamp == request.time
+   			&& request.resource.data.message is string
+        ;
+    }
+    match /users/{document} {
+      allow read: if request.auth.uid == document;
+    }
+  }
+}
 ```
 
 ## Developing
