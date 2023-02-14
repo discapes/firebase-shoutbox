@@ -3,6 +3,7 @@
 	import { addToShoutbox, getShoutbox } from '$lib/shoutbox';
 	import { oneField } from '$lib/utils';
 	import { doc, getDoc } from 'firebase/firestore';
+	import { get } from 'svelte/store';
 	import Login from './Login.svelte';
 	import Logout from './Logout.svelte';
 
@@ -15,7 +16,9 @@
 	}
 
 	function time(d: Date) {
-		return d.getHours() + ':' + d.getMinutes();
+		return (
+			d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0')
+		);
 	}
 </script>
 
@@ -52,7 +55,7 @@
 	{#if $userData}
 		Logged in as {$userData?.username}.
 		<Logout />
-	{:else}
+	{:else if !$user}
 		<Login />
 	{/if}
 </div>
